@@ -1,0 +1,10 @@
+server:
+  port: ${port.crawler}
+spring:
+  application:
+    name: ${sn.crawler}
+redis:
+  host: ${spring.redis.host}
+  port: ${spring.redis.port}
+  timeout: ${spring.redis.timeout}
+  password: ${spring.redis.password}

@@ -1,0 +1,10 @@
+server:
+  port: ${port.media}
+spring:
+  application:
+    name: ${sn.media}
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+FILE_SERVER_URL: http://192.168.202.200/

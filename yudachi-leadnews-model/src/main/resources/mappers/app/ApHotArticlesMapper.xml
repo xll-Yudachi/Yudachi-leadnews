@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yudachi.model.mappers.app.ApHotArticlesMapper">
+
+    <resultMap id="BaseResultMap" type="com.yudachi.model.article.pojos.ApHotArticles">
+        <id column="id" property="id"/>
+        <result column="entry_id" property="entryId"/>
+        <result column="tag_id" property="tagId"/>
+        <result column="tag_name" property="tagName"/>
+        <result column="score" property="score"/>
+        <result column="article_id" property="articleId"/>
+        <result column="province_id" property="provinceId"/>
+        <result column="city_id" property="cityId"/>
+        <result column="county_id" property="countyId"/>
+        <result column="is_read" property="isRead"/>
+        <result column="release_date" property="releaseDate"/>
+        <result column="created_time" property="createdTime"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        id, entry_id, tag_id, tag_name, score, article_id,
+        province_id,city_id,county_id,is_read,release_date,
+        created_time
+    </sql>
+
+    <sql id="Base_Column_Where">
+        <where>
+            <if test="entryId!=null and entryId!=''">
+                and entry_id = #{entryId}
+            </if>
+            <if test="tagId!=null and tagId!=''">
+                and tag_id = #{tagId}
+            </if>
+            <if test="tagName!=null and tagName!=''">
+                and tag_name = #{tagName}
+            </if>
+            <if test="score!=null and score!=''">
+                and score = #{score}
+            </if>
+            <if test="articleId!=null and articleId!=''">
+                and article_id = #{articleId}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="selectList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ap_hot_articles
+        <include refid="Base_Column_Where"/>
+    </select>
+
+
+    <select id="selectExpireMonth" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ap_hot_articles
+        <where>
+            where created_time > DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.yudachi.model.article.pojos.ApHotArticles">
+        insert into ap_hot_articles
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="entryId != null">
+                entry_id,
+            </if>
+            <if test="tagId != null">
+                tag_id,
+            </if>
+            <if test="tagName != null">
+                tag_name,
+            </if>
+            <if test="score != null">
+                score,
+            </if>
+            <if test="articleId != null">
+                article_id,
+            </if>
+            <if test="provinceId != null">
+                province_id,
+            </if>
+            <if test="cityId != null">
+                city_id,
+            </if>
+            <if test="countyId != null">
+                county_id,
+            </if>
+            <if test="isRead != null">
+                is_read,
+            </if>
+            <if test="releaseDate != null">
+                release_date,
+            </if>
+            <if test="createdTime != null">
+                created_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="entryId != null">
+                #{entryId,jdbcType=INTEGER},
+            </if>
+            <if test="tagId != null">
+                #{tagId,jdbcType=INTEGER},
+            </if>
+            <if test="tagName != null">
+                #{tagName,jdbcType=VARCHAR},
+            </if>
+            <if test="score != null">
+                #{score,jdbcType=INTEGER},
+            </if>
+            <if test="articleId != null">
+                #{articleId,jdbcType=INTEGER},
+            </if>
+            <if test="provinceId != null">
+                #{provinceId,jdbcType=INTEGER},
+            </if>
+            <if test="cityId != null">
+                #{cityId,jdbcType=INTEGER},
+            </if>
+            <if test="countyId != null">
+                #{countyId,jdbcType=INTEGER},
+            </if>
+            <if test="isRead != null">
+                #{isRead,jdbcType=TINYINT},
+            </if>
+            <if test="releaseDate != null">
+                #{releaseDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createdTime != null">
+                #{createdTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <!--
+    删除热文章数据
+  -->
+    <delete id="removeHotArticle" parameterType="java.lang.String">
+        delete from ap_hot_articles
+        where created_time &lt; #{removeDate}
+    </delete>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+         delete from ap_hot_articles where id= #{id}
+    </delete>
+
+    <!--
+      查询热文章数据
+    -->
+    <select id="loadArticleIdListByEntryId" parameterType="map" resultMap="BaseResultMap">
+        select * from ap_hot_articles
+        <where>
+            entry_id = #{entryId}  and is_read=0
+            <!-- loadmore -->
+            <if test="type != null and type == 1">
+                and release_date <![CDATA[<]]> #{dto.minBehotTime}
+            </if>
+            <if test="type != null and type == 2">
+                and release_date <![CDATA[>]]> #{dto.maxBehotTime}
+            </if>
+            <if test="dto.tag != '__all__'">
+                and tag_id = #{dto.tag}
+            </if>
+        </where>
+        limit #{dto.size}
+    </select>
+
+    <select id="selectTodayMaxScore" resultType="java.lang.Integer">
+    select max(score) from ap_hot_articles
+    where created_time &gt; #{today}
+  </select>
+
+    <update id="updateReadStatus">
+      update ap_hot_articles set is_read = 1
+      where entry_id = #{entryId} and article_id = #{articleId}
+  </update>
+
+    <!-- 依据地理位置获取 -->
+    <select id="loadHotListByLocation" resultMap="BaseResultMap">
+        select * from ap_hot_articles a
+        <where>
+            a.entry_id = 0
+            <if test="dto.provinceId!=null">
+                and a.province_id=#{dto.provinceId}
+            </if>
+            <if test="dto.cityId!=null">
+                and a.city_id=#{dto.cityId}
+            </if>
+            <if test="dto.countyId!=null">
+                and a.county_id=#{dto.countyId}
+            </if>
+            <!-- loadmore -->
+            <if test="type != null and type == 1">
+                and a.release_date <![CDATA[<]]> #{dto.minBehotTime}
+            </if>
+            <if test="type != null and type == 2">
+                and a.release_date <![CDATA[>]]> #{dto.maxBehotTime}
+            </if>
+            <if test="dto.tag != '__all__'">
+                and a.tag_id = #{dto.tag}
+            </if>
+        </where>
+        limit #{dto.size}
+    </select>
+</mapper>

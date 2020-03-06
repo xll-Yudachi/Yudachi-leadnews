@@ -1,0 +1,8 @@
+server:
+  port: ${port.user}
+spring:
+  application:
+    name: ${sn.user}
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8

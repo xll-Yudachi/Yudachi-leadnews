@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yudachi.model.mappers.wemedia.WmNewsStatisticsMapper">
+	<resultMap id="BaseResultMap" type="com.yudachi.model.media.pojos.WmNewsStatistics" >
+		<id column="id" property="id"/>
+		<result column="user_id" property="userId" />
+		<result column="article" property="article" />
+		<result column="read_count" property="readCount" />
+		<result column="comment" property="comment" />
+		<result column="follow" property="follow" />
+		<result column="collection" property="collection" />
+		<result column="forward" property="forward" />
+		<result column="likes" property="likes" />
+		<result column="unlikes" property="unlikes" />
+		<result column="unfollow" property="unfollow" />
+		<result column="created_time" property="createdTime" />
+	</resultMap>
+	<sql id="Base_Column_List" >
+		id, user_id, article, read_count, comment, follow, collection, forward,
+		likes, unlikes,
+		unfollow, created_time
+	</sql>
+
+	<select id="findByTimeAndUserId" resultType="com.yudachi.model.media.pojos.WmNewsStatistics">
+		/*!mycat:sql=select id from wm_news_statistics where burst='${burst}'*/
+		select
+			<include refid="Base_Column_List"/>
+		from
+			wm_news_statistics
+		<where>
+			user_id = #{userId}
+			<if test="dto.type == 0">
+				and date(created_time) = CURDATE()
+			</if>
+			<if test="dto.type != 0 and dto.stime != null">
+				and date(created_time) <![CDATA[ >= ]]> date(#{dto.stime})
+			</if>
+			<if test="dto.type != 0 and dto.etime != null">
+				and date(created_time) <![CDATA[ <= ]]> date(#{dto.etime})
+			</if>
+		</where>
+	</select>
+
+</mapper>

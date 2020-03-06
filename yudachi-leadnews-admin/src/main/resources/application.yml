@@ -1,0 +1,9 @@
+server:
+  port: ${port.admin}
+spring:
+  application:
+    name: ${sn.admin}
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+FILE_SERVER_URL: http://192.168.202.200/

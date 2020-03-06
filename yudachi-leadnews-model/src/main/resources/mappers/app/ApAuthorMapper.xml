@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yudachi.model.mappers.app.ApAuthorMapper" >
+    <resultMap id="BaseResultMap" type="com.yudachi.model.article.pojos.ApAuthor" >
+        <result column="id" property="id" />
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="user_id" property="userId"/>
+        <result column="created_time" property="createdTime"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        select * from ap_author where id=#{id}
+    </select>
+
+    <select id="selectByAuthorName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select * from ap_author where name=#{authorName}
+    </select>
+    <insert id="insert" parameterType="com.yudachi.model.article.pojos.ApAuthor">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyColumn="id" keyProperty="id">
+            select last_insert_id()
+        </selectKey>
+        insert into ap_author (name, type, user_id, wm_user_id,created_time)
+        values (#{name}, #{type}, #{userId},#{wmUserId}, #{createdTime})
+    </insert>
+    <select id="selectByIds" resultMap="BaseResultMap">
+        select * from ap_author
+        where id in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

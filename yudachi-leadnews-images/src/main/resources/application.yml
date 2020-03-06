@@ -1,0 +1,9 @@
+server:
+  port: ${port.images}
+spring:
+  application:
+    name: ${sn.images}
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+PREFIX: http://192.168.202.200
